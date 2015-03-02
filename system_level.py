@@ -5,12 +5,16 @@ import subprocess
 import platform
 import sys
 
+import json
+import urllib2
+
+
 current_python = platform.python_version_tuple()
 
 
 class system_level:
 
- def __init__(self): #Explicit is better than implicit 
+ def __init__(self, ddConfig): #Explicit is better than implicit 
    print "Done Init-ing!"  
    
    
@@ -102,16 +106,57 @@ class system_level:
     print stats
     return stats
 
-
-
 #network monitoring
 
-
-
-
-
-
-
+ def system_levelChecks(self, schedule, booly, BasicStats=False):
+     
+        os =  platform.dist()    
+         
+        diskUtil = self.Disk_Util()
+        cpuStats = self.CPU_Stats()
+        
+        #payload
+        finalPayload = {
+                'os': os        
+                      }
+        
+        if cpuStats:
+            finalPayload['cpuStats'] = cpuStats
+            
+        if diskUtil:
+            finalPayload['diskUtil'] = diskUtil
+            
+        if booly:
+            finalPayload['BasicStats'] = BasicStats
+        
+        #now convert the data into JSON
+        if int(platform.python_verson()) >= 6:
+            
+            try:
+                JsonData = json.dumps(finalPayload, encoding='latin1').encode('utf-8')
+        
+        
+            except Exception:
+                print("Nah! Not happening! shiitee!")
+                return false
+         
+        else:
+            #need to use minjson and support py V2.5 and below...(.)
+            print("ahh! the py is old!")
+            
+            pHash = md5(JsonData).hexdigest()
+            postData = urllib.urlencode(   #?
+            {
+                'payload': JsonData,
+                'hash': pHash
+            }
+        )
+        
+        
+        self.PostBack(postData)
+        #DONE
+        
+        schedule.enter(self.ddConfig['interval'], 1, self.system_levelChecks, (schedule, False))
 
 
 

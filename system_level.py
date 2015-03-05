@@ -122,15 +122,16 @@ class system_level:
         
         if cpuStats:
             finalPayload['cpuStats'] = cpuStats
-            
         if diskUtil:
             finalPayload['diskUtil'] = diskUtil
             
         if booly:
             finalPayload['BasicStats'] = BasicStats
+            
+        pyV = platform.python_version_tuple()
         
         #now convert the data into JSON
-        if int(platform.python_verson()) >= 6:
+        if int(pyV[1]) >= 6:
             
             try:
                 JsonData = json.dumps(finalPayload, encoding='latin1').encode('utf-8')

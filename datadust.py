@@ -16,7 +16,7 @@ if (sys.version_info[1]) <= 6:
     
 ddConfig = {
         'version': '0.1.0',
-        'interval': 120
+        'interval': 60
            }
 
 def no_of_cores():
@@ -29,7 +29,8 @@ def no_of_cores():
 
 class datadust_agent(Daemon):
     
-    
+   #def run(self): 
+       
     BasicStats = {
             'processorType': platform.processor(),
             'noOfCores': no_of_cores(),
@@ -47,15 +48,15 @@ class datadust_agent(Daemon):
     
     
 if __name__ == '__main__':
-        
+      argL = len(sys.argv)
     #need to do logging - logFile(.)
 
-      print("HERE 1")
+      
       d = datadust_agent() #pids..(..)
       
-      if argLen == 2 or argLen == 3:
+      if argL == 2 or argL == 3 or argL == 4:
          if 'start' == sys.argv[1]:
-            print("Started daemon..")
+            print("Started daemon..------------------------------------------------------")
             d.start()
          
          elif 'stop' == sys.argv[1]:

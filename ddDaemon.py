@@ -18,6 +18,7 @@ class Daemon:
         self.stdout = stdout
         self.stderr = stderr
         self.pidfile = pidfile
+        print("Done init-ing dz")
     
     def daemonize(self):
        
@@ -68,6 +69,7 @@ class Daemon:
         Start the daemon
         """
         # Check for a pidfile to see if the daemon already runs
+        
         try:
             pf = file(self.pidfile,'r')
             pid = int(pf.read().strip())

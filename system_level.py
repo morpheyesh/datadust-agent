@@ -8,13 +8,17 @@ import sys
 import json
 import urllib2
 
-
 current_python = platform.python_version_tuple()
 
-
+headers = {
+    'User-Agent': 'DataDust Agent',
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Accept': 'text/html, */*',
+}
 class system_level:
 
  def __init__(self, ddConfig): #Explicit is better than implicit 
+   self.ddConfig = ddConfig         
    print "Done Init-ing!"  
    
    
@@ -108,8 +112,24 @@ class system_level:
 
 #network monitoring
 
+#--
+ 
+ def PostBack(self, Data):
+   
+    try:
+       request = urllib2.Request("" + '/postback/', Data , headers)
+       response = urllib2.urlopen(request)
+       print("POSTBACK SUCCESSFUL! PARTY TIME!")
+        
+    except:
+        print("Tried to connect to the server.. failed! Sigh!" ) #Need to track all the possible error returns
+
+  
+   
+
  def system_levelChecks(self, schedule, booly, BasicStats=False):
-     
+        pData = {}
+        global pData
         os =  platform.dist()    
          
         diskUtil = self.Disk_Util()
@@ -140,29 +160,27 @@ class system_level:
             except Exception:
                 print("Nah! Not happening! shiitee!")
                 return false
-         
+       
         else:
             #need to use minjson and support py V2.5 and below...(.)
             print("ahh! the py is old!")
             
             pHash = md5(JsonData).hexdigest()
-            postData = urllib.urlencode(   #?
-            {
+            #global pData
+            pData = urllib.urlencode (   #?
+                 {
                 'payload': JsonData,
                 'hash': pHash
-            }
-        )
+                 }
+              )
         
         
-        self.PostBack(postData)
+        self.PostBack(pData)
         #DONE
         
         schedule.enter(self.ddConfig['interval'], 1, self.system_levelChecks, (schedule, False))
 
-
-
-
-
+ 
 
 
 

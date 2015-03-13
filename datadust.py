@@ -29,7 +29,7 @@ def no_of_cores():
 
 class datadust_agent(Daemon):
     
-   #def run(self): 
+   def run(self): 
        
     BasicStats = {
             'processorType': platform.processor(),
@@ -51,8 +51,20 @@ if __name__ == '__main__':
       argL = len(sys.argv)
     #need to do logging - logFile(.)
 
+      ddConfig['pidfileDirectory'] = '/tmp/'
+      pidFile = None
+      if argL == 3 or argL == 4:  
+        if sys.argv[2] == 'init':
+            
+            if os.path.exists('/var/run/datadust-agent/'):
+                pidFile = '/var/run/datadust-agent/datadust-agent.pid'
+            else:
+                pidFile = '/var/run/datadust-agent.pid'
+        
+        else:
+         pidFile = os.path.join(ddConfig['pidfileDirectory'], 'datadust-agent.pid')
       
-      d = datadust_agent() #pids..(..)
+      d = datadust_agent(pidFile) #pids..(..)
       
       if argL == 2 or argL == 3 or argL == 4:
          if 'start' == sys.argv[1]:

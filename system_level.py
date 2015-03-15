@@ -4,10 +4,15 @@ import string
 import subprocess
 import platform
 import sys
+import httplib, urllib
+    
 
+
+import pika
 import json
 import urllib2
 
+from hashlib import md5
 current_python = platform.python_version_tuple()
 
 headers = {
@@ -114,18 +119,20 @@ class system_level:
 
 #--
  
+ 
  def PostBack(self, Data):
-   
-    try:
-       request = urllib2.Request("" + '/postback/', Data , headers)
-       response = urllib2.urlopen(request)
-       print("POSTBACK SUCCESSFUL! PARTY TIME!")
-        
-    except:
-        print("Tried to connect to the server.. failed! Sigh!" ) #Need to track all the possible error returns
 
-  
-   
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+                    'localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue=os.uname()[1])
+    channel.basic_publish(exchange='',
+                      routing_key=os.uname()[1],
+                      body=Data)
+    connection.close()
+    
+    
+        
 
  def system_levelChecks(self, schedule, booly, BasicStats=False):
         pData = {}
@@ -144,9 +151,11 @@ class system_level:
             finalPayload['cpuStats'] = cpuStats
         if diskUtil:
             finalPayload['diskUtil'] = diskUtil
-            
+        
+        
         if booly:
             finalPayload['BasicStats'] = BasicStats
+            
             
         pyV = platform.python_version_tuple()
         
@@ -155,27 +164,28 @@ class system_level:
             
             try:
                 JsonData = json.dumps(finalPayload, encoding='latin1').encode('utf-8')
-        
+                
         
             except Exception:
-                print("Nah! Not happening! shiitee!")
+                print("Nah! Not happening!")
                 return false
        
         else:
             #need to use minjson and support py V2.5 and below...(.)
             print("ahh! the py is old!")
-            
-            pHash = md5(JsonData).hexdigest()
-            #global pData
-            pData = urllib.urlencode (   #?
-                 {
-                'payload': JsonData,
-                'hash': pHash
-                 }
-              )
+        '''    
+        pHash = md5(JsonData).hexdigest()
+        #global pData
+        pData = urllib.urlencode (   #?
+            {
+             'payload': JsonData,
+              'hash': pHash
+                }
+            ) 
+        print pData
+        '''
         
-        
-        self.PostBack(pData)
+        self.PostBack(JsonData)
         #DONE
         
         schedule.enter(self.ddConfig['interval'], 1, self.system_levelChecks, (schedule, False))

@@ -6,6 +6,7 @@ import subprocess
 import platform
 import sched
 import time
+import os
 
 from system_level import system_level
 from ddDaemon import Daemon
@@ -29,13 +30,15 @@ def no_of_cores():
 
 class datadust_agent(Daemon):
     
+    
+    
    def run(self): 
-       
     BasicStats = {
             'processorType': platform.processor(),
             'noOfCores': no_of_cores(),
             'os': sys.platform,      
-            'nixDist': platform.dist()   
+            'nixDist': platform.dist(),  
+            'hostname' :  os.uname()[1]
                  } 
     #expand later when more dist support!(.) 
     
@@ -61,14 +64,20 @@ if __name__ == '__main__':
             else:
                 pidFile = '/var/run/datadust-agent.pid'
         
-        else:
+      else:
          pidFile = os.path.join(ddConfig['pidfileDirectory'], 'datadust-agent.pid')
+         
+         
+      if not os.access(ddConfig['pidfileDirectory'], os.W_OK):
+       print 'Unable to write the PID file at ' + pidFile
+       print 'Agent will now quit'
+       sys.exit(1)  
       
       d = datadust_agent(pidFile) #pids..(..)
       
       if argL == 2 or argL == 3 or argL == 4:
          if 'start' == sys.argv[1]:
-            print("Started daemon..------------------------------------------------------")
+            print("Started daemon-->")
             d.start()
          
          elif 'stop' == sys.argv[1]:

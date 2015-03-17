@@ -5,7 +5,7 @@ import subprocess
 import platform
 import sys
 import httplib, urllib
-    
+
 
 
 import pika
@@ -15,7 +15,7 @@ import urllib2
 from hashlib import md5
 current_python = platform.python_version_tuple()
 
-headers = {
+headers = { #not required. design changed- using AMQP
     'User-Agent': 'DataDust Agent',
     'Content-Type': 'application/x-www-form-urlencoded',
     'Accept': 'text/html, */*',
@@ -64,7 +64,7 @@ class system_level:
        proc = None
        
        try:
-          proc = subprocess.Popen(['mpstat', '-P', 'ALL', '1', '1'], stdout=subprocess.PIPE)
+          proc = subprocess.Popen(['mpstat', '-P', 'ALL', '1', '1'], stdout=subprocess.PIPE, shell=True)
           
           mpstat = proc.communicate()[0]
           print "----"
@@ -114,6 +114,48 @@ class system_level:
     print 'Done!'
     print stats
     return stats
+ 
+ def freeMemory(self):
+     
+     if sys.platform == 'linux2':
+         print ("alrighty!")
+         
+         try:
+           free_mem = subprocess.Popen(['free mem'], stdout=subprocess.PIPE, shell=True)
+           freemem = free_mem.communicate()[0]
+           
+           singleTuples =  freemem.split('\n')
+           
+           split_them = singleTuples[1].split()
+           
+           total = split_them[1]
+           used = split_them[2]
+           free = split_them[3]
+           #convert to Gbs
+           totalMemory = (float(total) / 1024) / 1024
+           usedMemory = (float(used) / 1024 ) / 1024
+           freeMemory = (float(free) / 1024) / 1024
+           #print totalMemory
+           #print userMemory
+           #print freeMemory 
+           
+           freeMemory = {
+                   'total': totalMemory,
+                   'usedMemory': usedMemory, 
+                   'freeMemory': freeMemory     
+                         }
+           print freeMemory
+           return freeMemory
+           
+           
+           
+           
+           
+         except:
+            print ("subprocess did not execute")
+            
+     else:
+         print ("It does not work at all")              
 
 #network monitoring
 

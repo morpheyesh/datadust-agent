@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 
@@ -32,7 +33,7 @@ class datadust_agent(Daemon):
     
     
     
-   def run(self): 
+  def run(self): 
     BasicStats = {
             'processorType': platform.processor(),
             'noOfCores': no_of_cores(),

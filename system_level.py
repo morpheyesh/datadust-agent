@@ -64,7 +64,7 @@ class system_level:
        proc = None
        
        try:
-          proc = subprocess.Popen(['mpstat', '-P', 'ALL', '1', '1'], stdout=subprocess.PIPE, shell=True)
+          proc = subprocess.Popen(['mpstat', '-P', 'ALL', '1', '2'], stdout=subprocess.PIPE, shell=True)
           
           mpstat = proc.communicate()[0]
           print "----"
